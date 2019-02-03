@@ -2,29 +2,41 @@
 //
 // tb_robber_language.v
 // ------------------
-// Testbench for the pirate cipher core.
-//
-//    This program is free software; you can redistribute it and/or
-//    modify it under the terms of the GNU General Public License as
-//    published by the Free Software Foundation; either version 2 of
-//    the License, or (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public
-//    License along with this program; if not, write to the Free
-//    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-//    MA 02111-1307, USA
+// Testbench for the robber_language core.
 //
 //
-// (c) 2007 Joachim Strömbergson
+// Author: Joachim Strombergson
+// Copyright (c) 2007-2019, Assured AB
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
 
-module tb_robber_language ();
+module tb_robber_language;
 
   //---------------------------------------------------------------
   // Constant and parameter declarations
@@ -273,107 +285,6 @@ module tb_robber_language ();
        tb_encdec 	    = 0;
      end
    endtask // init_testbench
-
-
-//    //---------------------------------------------------------------
-//    // tc1_trigger_init
-//    // Test case1: Load key.
-//    // This test case will trigger an init for encipher.
-//    // the DUT.
-//    //---------------------------------------------------------------
-//    task tc1_trigger_init
-//       output [31:0] errors_found;
-//       begin
-// 	 // Clear the errors_found counter
-// 	 errors_found = 0;
-
-// 	 // Load a static one key into the key_mem.
-// 	 for (i = 0 ; i < 32 ; i = i + 1)
-// 	   begin
-// 	      tb_key_address = i[4:0];
-// 	      if (TC1_STATIC_KEY)
-// 		begin
-// 		   tb_key_data = TC1_KEY_BYTE;
-// 		end
-// 	      else
-// 		begin
-// //		   tb_key_data = i;
-// 		   tb_key_data = 2;
-// 		end
-// 	      tb_key_data_valid = 1;
-// 	      #(CLOCK);
-// 	   end
-
-// 	 // Turn off key_data_valid again.
-// 	 tb_key_data_valid = 0;
-
-//  	 $display("TB-SIM: Key loaded ok.");
-//      end
-//    endtask // tc1_load_key
-
-
-//    //---------------------------------------------------------------
-//    // tc2_init_cipher;
-//    // Test case2: Init cipher.
-//    // This test case will trigger a cipher init operation in the
-//    // the DUT.
-//    //---------------------------------------------------------------
-//    task tc2_init_cipher;
-//       output [31:0] errors_found;
-//       begin
-// 	 $display("");
-// 	 $display("TC2: Cipher init.");
-// 	 // Clear the errors_found counter
-// 	 errors_found = 0;
-
-// 	 // Wait a few cycles
-// //	 #(CLOCK * 40);
-
-// 	 // Set the tb_init_cipher high for a cycle.
-// 	 tb_init_cipher = 1;
-// 	 $display("TB-ARCFOUR: init_cipher = %1d", tb_init_cipher);
-// 	 #(2* CLOCK);
-// 	 tb_init_cipher = 0;
-// 	 $display("TB-ARCFOUR: init_cipher = %1d", tb_init_cipher);
-
-// 	 while (tb_k_valid == 0)
-// 	   begin
-// 	      #(CLOCK);
-// 	   end
-
-// 	 $display("TB-INFO: Init seems to be completed.");
-// 	 $display("TB-INFO: Dumping internal state");
-// 	 $display("TB-INFO: ip = %3d, id = %3d", DUT.ip, DUT.id);
-// 	 $display("TB-INFO: jp = %3d, jd = %3d", DUT.jp, DUT.jd);
-// 	 $display("TB-INFO: kp = %3d, kd = %3d", DUT.kp, DUT.kd);
-// 	 $display("");
-
-// 	 for (i = 0 ; i < 256 ; i = i + 1)
-// 	   begin
-// 	      $display("state_mem[%3d] = %3d", i, DUT.state_mem.mem_array[i]);
-// 	   end
-
-// 	 $display("Generating 1000 values.");
-// 	 for (values = 0 ; values < 1000 ; values = values + 1)
-// 	   begin
-// 	      tb_next_k = 1;
-// 	      #(CLOCK * 1);
-
-// 	      while (tb_k_valid == 0)
-// 		begin
-// 		   #(CLOCK);
-// 		end
-// 	      $display("TB-INFO: Round = %4d, K_data = %3d", values, tb_k_data);
-// 	   end
-
-// 	 // Turn off generation.
-// 	 tb_next_k = 0;
-
-// 	 errors_found = 0;
-//      end
-//    endtask // tc2_init_cipher
-
-
 
 
    //---------------------------------------------------------------

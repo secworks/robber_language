@@ -8,22 +8,34 @@
 // The core accepts 8-bit character data as input and will emit 8-bit
 // data.
 //
-//    This program is free software; you can redistribute it and/or
-//    modify it under the terms of the GNU General Public License as
-//    published by the Free Software Foundation; either version 2 of
-//    the License, or (at your option) any later version.
+// Author: Joachim Strombergson
+// Copyright (c) 2007-2019, Assured AB
+// All rights reserved.
 //
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
 //
-//    You should have received a copy of the GNU General Public
-//    License along with this program; if not, write to the Free
-//    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-//    MA 02111-1307, USA
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
 //
-// (c) 2007 Joachim Strömbergson
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
 
@@ -46,21 +58,20 @@ module robber_language(
   //----------------------------------------------------------------
   // Constant and parameter definitions.
   //----------------------------------------------------------------
-  // Symbolic names for data out mux control.
-  parameter 	    DOUT_DIN  = 0;
-  parameter 	    DOUT_OH   = 1;
-  parameter 	    DOUT_HOLD = 2;
-
+  // Output mux control.
+  parameter  DOUT_DIN  = 0;
+  parameter  DOUT_OH   = 1;
+  parameter  DOUT_HOLD = 2;
 
   // Symbolic names for control FSM states.
-  parameter 	    FSM_IDLE = 0;
-  parameter 	    FSM_INIT = 1;
-  parameter 	    FSM_ENC0 = 2;
-  parameter 	    FSM_ENC1 = 3;
-  parameter 	    FSM_ENC2 = 4;
-  parameter 	    FSM_DEC0 = 5;
-  parameter 	    FSM_DEC1 = 6;
-  parameter 	    FSM_DEC2 = 7;
+  parameter FSM_IDLE = 0;
+  parameter FSM_INIT = 1;
+  parameter FSM_ENC0 = 2;
+  parameter FSM_ENC1 = 3;
+  parameter FSM_ENC2 = 4;
+  parameter FSM_DEC0 = 5;
+  parameter FSM_DEC1 = 6;
+  parameter FSM_DEC2 = 7;
 
 
   //----------------------------------------------------------------
@@ -68,33 +79,33 @@ module robber_language(
   //----------------------------------------------------------------
   // consonant_hold_reg
   // Hold register for received consonants.
-  reg [7 : 0] 		    consonant_hold_reg;
-  reg 			    consonant_hold_we;
+  reg [7 : 0] consonant_hold_reg;
+  reg 	      consonant_hold_we;
 
   // data_out_reg
   // Data output register.
-  reg [7 : 0] 		    data_out_reg;
-  reg [7 : 0] 		    data_out_new;
-  reg 			    data_out_we;
+  reg [7 : 0] data_out_reg;
+  reg [7 : 0] data_out_new;
+  reg 	      data_out_we;
 
   // data_out_valid_reg
   // Data output register.
-  reg 			    data_out_valid_reg;
-  reg 			    data_out_valid_new;
-  reg 			    data_out_valid_we;
+  reg data_out_valid_reg;
+  reg data_out_valid_new;
+  reg data_out_valid_we;
 
   // busy_reg;
   // Output register for the busy signal. We don't want
   // combinational loops from the data_in_valid to busy.
-  reg 			    busy_reg;
-  reg 			    busy_new;
-  reg 			    busy_we;
+  reg busy_reg;
+  reg busy_new;
+  reg busy_we;
 
-  // pirate_cipher_state_reg
+  // robber_language_state_reg
   // control FSM state register.
-  reg [2 : 0] 		    pirate_cipher_state_reg;
-  reg [2 : 0] 		    pirate_cipher_state_new;
-  reg 			    pirate_cipher_state_we;
+  reg [2 : 0] robber_language_state_reg;
+  reg [2 : 0] robber_language_state_new;
+  reg 	      robber_language_state_we;
 
 
   //----------------------------------------------------------------
@@ -130,43 +141,28 @@ module robber_language(
       if (!reset_l)
 	begin
 	  // Reset all registers to defined values.
-	  consonant_hold_reg <= 0;
-
-	  busy_reg 		    <= 0;
-
-	  data_out_reg 		    <= 0;
-	  data_out_valid_reg 	    <= 0;
-
-	  pirate_cipher_state_reg   <= FSM_IDLE;
+	  consonant_hold_reg        <= 0;
+	  busy_reg 	            <= 0;
+	  data_out_reg              <= 0;
+	  data_out_valid_reg        <= 0;
+	  robber_language_state_reg <= FSM_IDLE;
 	end
       else
 	begin
-	  // Normal register updates.
-
 	  if (consonant_hold_we)
-	    begin
-	      consonant_hold_reg    <= data_in;
-	    end
+	    consonant_hold_reg <= data_in;
 
 	  if (busy_we)
-	    begin
-	      busy_reg <= busy_new;
-	    end
+	    busy_reg <= busy_new;
 
 	  if (data_out_we)
-	    begin
-	      data_out_reg <= data_out_new;
-	    end
+	    data_out_reg <= data_out_new;
 
 	  if (data_out_valid_we)
-	    begin
-	      data_out_valid_reg <= data_out_valid_new;
-	    end
+	    data_out_valid_reg <= data_out_valid_new;
 
-	  if (pirate_cipher_state_we)
-	    begin
-	      pirate_cipher_state_reg <= pirate_cipher_state_new;
-	    end
+	  if (robber_language_state_we)
+	    robber_language_state_reg <= robber_language_state_new;
 	end
     end
 
@@ -196,370 +192,255 @@ module robber_language(
   //----------------------------------------------------------------
   always @*
     begin : data_out_mux
+      data_out_new = data_in;
+
       case (data_out_mux_ctrl)
-	// DOUT_DIN
-	// Data in is passed right through to the data out register.
-	DOUT_DIN :
-	  begin
-	    data_out_new = data_in;
-	  end
+	DOUT_DIN  : data_out_new = data_in;
+	DOUT_OH   : data_out_new = "o";
+	DOUT_HOLD : data_out_new = consonant_hold_reg;
 
-
-	// DOUT_OH
-	// The letter "o" is sent to the data out register.
-	DOUT_OH :
-	  begin
-	    data_out_new = "o";
-	  end
-
-
-	// DOUT_HOLD
-	// The data in the hold register is sent to the data out register.
-	DOUT_HOLD :
-	  begin
-	    data_out_new = consonant_hold_reg;
-	  end
-
-
-	// default
-	// By default we send data in to data out register.
 	default :
 	  begin
-	    data_out_new = data_in;
 	  end
       endcase // case(data_out_mux_ctrl)
     end // data_out_mux
 
 
   //----------------------------------------------------------------
-  // pirate_cipher_ctrl
+  // robber_language_ctrl
   // This combinational block contains the control FSM for the
   // pirate cipher core.
   //----------------------------------------------------------------
   always @*
-    begin : pirate_cipher_ctrl
+    begin : robber_language_ctrl
       // Default assignments
+      data_out_we 	        = 0;
+      data_out_valid_new        = 0;
+      data_out_valid_we         = 0;
+      consonant_hold_we         = 0;
+      busy_new 		        = 0;
+      busy_we 		        = 0;
+      data_out_mux_ctrl         = DOUT_DIN;
+      robber_language_state_new = FSM_IDLE;
+      robber_language_state_we  = 0;
 
-      data_out_we 		 = 0;
-
-      data_out_valid_new 	 = 0;
-      data_out_valid_we 	 = 0;
-
-      consonant_hold_we 	 = 0;
-
-      busy_new 			 = 0;
-      busy_we 			 = 0;
-
-      data_out_mux_ctrl 	 = DOUT_DIN;
-
-      pirate_cipher_state_new 	 = FSM_IDLE;
-      pirate_cipher_state_we 	 = 0;
-
-      case (pirate_cipher_state_reg)
-
-	// FSM_IDLE
-	// We start in this state after reset and we stay here until
-	// the application sets the initial signal. When init is
-	// asserted we move to the init state.
-	FSM_IDLE :
+      case (robber_language_state_reg)
+	FSM_IDLE:
 	  begin
 	    if (init)
 	      begin
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	  end
 
-	// FSM_INIT
-	// We drop any data_out valid signal and any busy signal.
-	// We then look at the encdec signal to determine how to
-	// hande received dataa. We then move to the
-	// appropriate state.
-	FSM_INIT :
-	  begin
-	    busy_new 			   = 0;
-	    busy_we 			   = 1;
 
-	    data_out_valid_new 		   = 0;
-	    data_out_valid_we 		   = 1;
+	FSM_INIT:
+	  begin
+	    busy_new 	       = 0;
+	    busy_we 	       = 1;
+	    data_out_valid_new = 0;
+	    data_out_valid_we  = 1;
 
 	    if (encdec)
 	      begin
-		// We shoud encipher.
-		pirate_cipher_state_new = FSM_ENC0;
-		pirate_cipher_state_we  = 1;
+		robber_language_state_new = FSM_ENC0;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		// We should decipher.
-		pirate_cipher_state_new    = FSM_DEC0;
-		pirate_cipher_state_we 	   = 1;
+		robber_language_state_new = FSM_DEC0;
+		robber_language_state_we  = 1;
 	      end
 	  end
 
 
-	// FSM_ENC0
-	// First we check if we get a new init signal. If we do
-	// we go directly to the FSM_INIT state. If not we
-	// drop any data valid flag and wait for new data. When
-	// data is avaiable we check how it should be handled and
-	// then assert the data out valid flag. If the data received
-	// is a consonant we also assert the busy flag and move to
-	// the FSM_ENC1 state. If else we hang around here and wait
-	// for more data.
-	FSM_ENC0 :
+	FSM_ENC0:
 	  begin
 	    if (init)
 	      begin
-		busy_new 		   = 0;
-		busy_we 		   = 1;
-
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
-
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		busy_new 		  = 0;
+		busy_we 		  = 1;
+		data_out_valid_new 	  = 0;
+		data_out_valid_we 	  = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		// By default we don't have any valid data out.
-		data_out_valid_new    = 0;
-		data_out_valid_we     = 1;
+		data_out_valid_new = 0;
+		data_out_valid_we  = 1;
 
-		// Wait here for data.
 		if (data_in_valid)
 		  begin
-		    // We have data. Assert the data valid flag
-		    // and store the data in the data out reg.
-		    // We then check if it is a consonant.
-		    data_out_we 	  = 1;
-		    data_out_valid_new 	  = 1;
-		    data_out_valid_we 	  = 1;
-		    data_out_mux_ctrl 	  = DOUT_DIN;
+		    data_out_we        = 1;
+		    data_out_valid_new = 1;
+		    data_out_valid_we  = 1;
+		    data_out_mux_ctrl  = DOUT_DIN;
 
 		    if (is_consonant)
 		      begin
-			// Yes, we got a consonant. Store the data
-			// in the hold register and assert the busy
-			// flag. We then move to FSM_ENC1.
-			busy_new 		   = 1;
-			busy_we 		   = 1;
-
-			consonant_hold_we 	   = 1;
-			pirate_cipher_state_new    = FSM_ENC1;
-			pirate_cipher_state_we 	   = 1;
+			busy_new 	          = 1;
+			busy_we 	          = 1;
+			consonant_hold_we         = 1;
+			robber_language_state_new = FSM_ENC1;
+			robber_language_state_we  = 1;
 		      end
 		  end
 	      end
 	  end
 
 
-	// We start by checking if there is an init signal. If there is
-	// we move to the FSM_INIT state, dropping all flags. If not
-	// we should emit an "o" and then move to the FSM_ENC2 state.
-	FSM_ENC1 :
+	FSM_ENC1:
 	  begin
 	    if (init)
 	      begin
-		busy_new 		   = 0;
-		busy_we 		   = 1;
-
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
-
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		busy_new 	        = 0;
+		busy_we 	        = 1;
+		data_out_valid_new      = 0;
+		data_out_valid_we       = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		data_out_mux_ctrl 	   = DOUT_OH;
-		data_out_we 		   = 1;
-
-		pirate_cipher_state_new    = FSM_ENC2;
-		pirate_cipher_state_we 	   = 1;
+		data_out_mux_ctrl       = DOUT_OH;
+		data_out_we 	        = 1;
+		robber_language_state_new = FSM_ENC2;
+		robber_language_state_we  = 1;
 	      end
 	  end
 
 
-	// We start by checking if there is an init signal. If there is
-	// we move to the FSM_INIT state, dropping all flags. If not
-	// we should emit an "o" and then move to the FSM_ENC2 state.
 	FSM_ENC2 :
 	  begin
 	    if (init)
 	      begin
-		busy_new 		   = 0;
-		busy_we 		   = 1;
-
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
-
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		busy_new 	        = 0;
+		busy_we 	        = 1;
+		data_out_valid_new      = 0;
+		data_out_valid_we       = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		data_out_mux_ctrl 	   = DOUT_HOLD;
-		data_out_we 		   = 1;
-
-		pirate_cipher_state_new    = FSM_ENC0;
-		pirate_cipher_state_we 	   = 1;
+		data_out_mux_ctrl         = DOUT_HOLD;
+		data_out_we 	          = 1;
+		robber_language_state_new = FSM_ENC0;
+		robber_language_state_we  = 1;
 	      end
 	  end
 
-
-	// FSM_DEC0
-	//
-	FSM_DEC0 :
+	FSM_DEC0:
 	  begin
 	    if (init)
 	      begin
 		busy_new 		   = 0;
 		busy_we 		   = 1;
-
 		data_out_valid_new 	   = 0;
 		data_out_valid_we 	   = 1;
-
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		robber_language_state_new  = FSM_INIT;
+		robber_language_state_we   = 1;
 	      end
 	    else
 	      begin
-		// We stay here until we get an input. We
-		// also drop the data out valid flag.
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
+		data_out_valid_new = 0;
+		data_out_valid_we  = 1;
 
 		if (data_in_valid)
 		  begin
-		    // We have data. Assert the data valid flag
-		    // and store the data in the data out reg.
-		    // We then check if it is a consonant.
-		    data_out_we 	  = 1;
-		    data_out_valid_new 	  = 1;
-		    data_out_valid_we 	  = 1;
-		    data_out_mux_ctrl 	  = DOUT_DIN;
+		    data_out_we        = 1;
+		    data_out_valid_new = 1;
+		    data_out_valid_we  = 1;
+		    data_out_mux_ctrl  = DOUT_DIN;
 
 		    if (is_consonant)
 		      begin
-			// Yes, we got a consonant. This means we should
-			// try and consume to more bytes of data. We
-			// move to FSM_DEC1.
-			consonant_hold_we        = 1;
-			pirate_cipher_state_new  = FSM_DEC1;
-			pirate_cipher_state_we 	 = 1;
+			consonant_hold_we         = 1;
+			robber_language_state_new = FSM_DEC1;
+			robber_language_state_we  = 1;
 		      end
 		  end
 	      end
 	  end
 
-	// FSM_DEC1
-	// Check for an init signal. If found we move to the
-	// FSM_INIT state. If not found we wait for the next
-	// data. If it is an "o" we consume
-	// the data and move to the FSM_DEC2 state. If not we
-	// move to the FSM_DEC0 state.
-	FSM_DEC1 :
+	FSM_DEC1:
 	  begin
 	    if (init)
 	      begin
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
+		data_out_valid_new = 0;
+		data_out_valid_we  = 1;
 
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		// We stay here until we get an input. We
-		// also drop the data out valid flag.
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
+		data_out_valid_new = 0;
+		data_out_valid_we  = 1;
 
 		if (data_in_valid)
 		  begin
-		    // We check if the data is an "o". If it is
-		    // we simply ignore the data and move to FSM_DEC2.
-		    // If not we have a problem. We emit the data and move
-		    // to FSM_DEC0.
 		    if (data_in == "o")
 		      begin
-			pirate_cipher_state_new = FSM_DEC2;
-			pirate_cipher_state_we 	= 1;
+			robber_language_state_new = FSM_DEC2;
+			robber_language_state_we  = 1;
 		      end
 		    else
 		      begin
-			data_out_we 		   = 1;
-			data_out_valid_new 	   = 1;
-			data_out_valid_we 	   = 1;
-			data_out_mux_ctrl 	   = DOUT_DIN;
-
-			pirate_cipher_state_new    = FSM_DEC0;
-			pirate_cipher_state_we 	   = 1;
+			data_out_we               = 1;
+			data_out_valid_new        = 1;
+			data_out_valid_we         = 1;
+			data_out_mux_ctrl         = DOUT_DIN;
+			robber_language_state_new = FSM_DEC0;
+			robber_language_state_we  = 1;
 		      end
 		  end
 	      end
 	  end
 
 	// FSM_DEC2
-	// Wait for the next data. If it matches the data in the
-	// hold register we consume the data. If not we move to the
-	// FSM_DEC0 state.
 	FSM_DEC2 :
 	  begin
 	    if (init)
 	      begin
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
-
-		pirate_cipher_state_new    = FSM_INIT;
-		pirate_cipher_state_we 	   = 1;
+		data_out_valid_new        = 0;
+		data_out_valid_we         = 1;
+		robber_language_state_new = FSM_INIT;
+		robber_language_state_we  = 1;
 	      end
 	    else
 	      begin
-		// We stay here until we get an input. We
-		// also drop the data out valid flag.
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
+		data_out_valid_new = 0;
+		data_out_valid_we  = 1;
 
 		if (data_in_valid)
 		  begin
-		    // We check if the data is what is stored in the
-		    // hold register. If it is we ignore the data and
-		    // move to FSM_DEC0. If not we have a problem.
-		    // We emit the data and move to FSM_DEC0.
 		    if (data_in == consonant_hold_reg)
 		      begin
-			pirate_cipher_state_new = FSM_DEC0;
-			pirate_cipher_state_we 	= 1;
+			robber_language_state_new = FSM_DEC0;
+			robber_language_state_we  = 1;
 		      end
 		    else
 		      begin
-			data_out_we 		= 1;
-			data_out_valid_new 	= 1;
-			data_out_valid_we 	= 1;
-			data_out_mux_ctrl 	= DOUT_DIN;
-
-			pirate_cipher_state_new = FSM_DEC0;
-			pirate_cipher_state_we 	= 1;
-
+			data_out_we 	          = 1;
+			data_out_valid_new        = 1;
+			data_out_valid_we         = 1;
+			data_out_mux_ctrl         = DOUT_DIN;
+			robber_language_state_new = FSM_DEC0;
+			robber_language_state_we  = 1;
 		      end
 		  end
 	      end
 	  end
 
 
-	// default
-	// Empty default state to help parsers that need help to
-	// fill up the state space.
 	default :
 	  begin
-	    // Empty state since we define all control signals
-	    // in the default assignment at the top of the process.
 	  end
-      endcase // case(arc4_state_reg)
-    end // pirate_cipher_ctrl
-
+      endcase // case (robber_language_state_reg)
+    end // block: robber_language_ctrl
 endmodule // robber_language
 
 //======================================================================
