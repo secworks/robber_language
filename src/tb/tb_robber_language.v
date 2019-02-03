@@ -1,30 +1,30 @@
 //======================================================================
 //
-// tb_pirate_cipher.v
+// tb_robber_language.v
 // ------------------
 // Testbench for the pirate cipher core.
 //
-//    This program is free software; you can redistribute it and/or 
-//    modify it under the terms of the GNU General Public License as 
-//    published by the Free Software Foundation; either version 2 of 
+//    This program is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU General Public License as
+//    published by the Free Software Foundation; either version 2 of
 //    the License, or (at your option) any later version.
-//  
+//
 //    This program is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
-//  
-//    You should have received a copy of the GNU General Public 
-//    License along with this program; if not, write to the Free 
-//    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+//
+//    You should have received a copy of the GNU General Public
+//    License along with this program; if not, write to the Free
+//    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 //    MA 02111-1307, USA
 //
 //
 // (c) 2007 Joachim Strömbergson
-// 
+//
 //======================================================================
 
-module tb_pirate_cipher ();
+module tb_robber_language ();
 
   //---------------------------------------------------------------
   // Constant and parameter declarations
@@ -33,24 +33,24 @@ module tb_pirate_cipher ();
   // This parameter controls if the internal probes will be
   // active or not.
   parameter PROBES_ON = 1;
-  
+
   // CLOCK
   // The number of clock toggles that represent a clock cycle.
   // Naturally this value is 2, but we want symbolic constants.
   parameter CLOCK = 2;
-  
+
   // RESET_TIME
   // The number of clock cycles the reset is asserted.
   parameter RESET_TIME = 10;
-  
+
   // DEBUG_MONITOR
   // Controls if the debug monitor should be active or not.
   parameter DEBUG_MONITOR = 0;
-  
+
   // END_CYCLE
   // The cycle the simulation should end.
   parameter MAX_CYCLES = 1000000;
-  
+
   // Testcase state names
   parameter IDLE            = 0;
   parameter LOAD_KEY        = 10;
@@ -58,28 +58,28 @@ module tb_pirate_cipher ();
   parameter INIT_CIPHER_1   = 20;
   parameter INIT_CIPHER_2   = 25;
   parameter FINISH          = 100;
-  
+
   parameter TC1_STATIC_KEY  = 0;
   parameter TC1_KEY_BYTE    = 2;
 
-  
+
   //----------------------------------------------------------------
   // Register declarations.
   //----------------------------------------------------------------
   // Clock and reset.
   reg 	       clk     = 0;
   reg 	       reset_l = 0;
-  
+
   // Cycle counter and other test functionality regs..
   reg [31 : 0] cycle_counter;
-  
+
   // Error counter, used to track the number of errors.
   integer      num_errors;
   integer      errors;
-  
+
   integer      values;
 
-  
+
   //----------------------------------------------------------------
   // Variable declarations - wires.
   //----------------------------------------------------------------
@@ -95,12 +95,12 @@ module tb_pirate_cipher ();
   wire 		tb_data_out_valid;
 
   reg 	       enable_monitor;
-   
+
   // Assorted test case variables.
-  reg [31 : 0] i; 
+  reg [31 : 0] i;
   reg [31 : 0] new_i;
-  
-  
+
+
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
@@ -110,21 +110,21 @@ module tb_pirate_cipher ();
   // idut
   // Instantiation of the Device Under Test (DUT), the core.
   //----------------------------------------------------------------
-  pirate_cipher  idut (
-                      .data_in(tb_data_in),
-	              .data_in_valid(tb_data_in_valid),
+  robber_language  dut (
+	                .clk(clk),
+	                .reset_l(reset_l),
 
-	              .init(tb_init),
-	              .encdec(tb_encdec),
-		      .busy(tb_busy),
+                        .data_in(tb_data_in),
+	                .data_in_valid(tb_data_in_valid),
 
-	              .data_out(tb_data_out),
-	              .data_out_valid(tb_data_out_valid),
+	                .init(tb_init),
+	                .encdec(tb_encdec),
+		        .busy(tb_busy),
 
-	              .clk(clk),
-	              .reset_l(clk)
-	             );
-  
+	                .data_out(tb_data_out),
+	                .data_out_valid(tb_data_out_valid)
+	               );
+
 
    //---------------------------------------------------------------
    // check_result
@@ -145,18 +145,18 @@ module tb_pirate_cipher ();
 	   end
       end
    endtask // check_response
-   
-   
+
+
    //---------------------------------------------------------------
    // Clock generator process
    // Will toggle the clk every timescale time period.
    //---------------------------------------------------------------
    always begin
-      #(CLOCK / 2); 
+      #(CLOCK / 2);
       clk = !clk;
    end
 
-   
+
    //---------------------------------------------------------------
    // Reset generator
    //---------------------------------------------------------------
@@ -164,13 +164,13 @@ module tb_pirate_cipher ();
      begin
 	// Wait RESET_TIME number of cycles before releasing
 	// the reset.
-	#(CLOCK * RESET_TIME); 
+	#(CLOCK * RESET_TIME);
 	reset_l = 1;
 	$display("TB-SIM: Reset released.");
    end
 
 
-/*   
+/*
    //---------------------------------------------------------------
    // Monitor process. if DEBUG_MONITOR is active the process
    // continiously detects and reports on changes to the
@@ -180,15 +180,15 @@ module tb_pirate_cipher ();
      begin
 	if (1 == DEBUG_MONITOR)
 	  begin
-	     $display("TB-INFO (cycle = %4d): key_address = %d, key_data = %d, key_data_valid = %d", 
+	     $display("TB-INFO (cycle = %4d): key_address = %d, key_data = %d, key_data_valid = %d",
 		      cycle_counter, tb_key_address, tb_key_data, tb_key_data_valid);
-	     $display("TB-INFO (cycle = %4d): init_cipher = %d, next_k = %d", 
+	     $display("TB-INFO (cycle = %4d): init_cipher = %d, next_k = %d",
 		      cycle_counter, tb_init_cipher,tb_next_k);
-	     $display("TB-INFO (cycle = %4d): k_data = %d, k_valid = %d", 
+	     $display("TB-INFO (cycle = %4d): k_data = %d, k_valid = %d",
 		      cycle_counter, tb_k_data, tb_k_valid);
 	  end
      end
-*/        
+*/
 
    //---------------------------------------------------------------
    // Cycle counter process
@@ -214,7 +214,7 @@ module tb_pirate_cipher ();
 	  end
      end
 
-  
+
   //----------------------------------------------------------------
   // dut_state_mon
   // This block contains a synchronous state monitor for the
@@ -235,7 +235,7 @@ module tb_pirate_cipher ();
 	end
     end // dut_state_mon
 
-  
+
   //----------------------------------------------------------------
   // reg_update
   // This block contains all the register updates in the arc4 core.
@@ -246,15 +246,15 @@ module tb_pirate_cipher ();
     begin : reg_update
       if (!reset_l)
 	begin
-	  
+
 	end
       else
 	begin
 
 	end
     end // reg_update.
-  
-   
+
+
    //---------------------------------------------------------------
    // init_testbench
    // At time 0 this will initialize the testbench and the DUT.
@@ -274,7 +274,7 @@ module tb_pirate_cipher ();
      end
    endtask // init_testbench
 
-   
+
 //    //---------------------------------------------------------------
 //    // tc1_trigger_init
 //    // Test case1: Load key.
@@ -306,12 +306,12 @@ module tb_pirate_cipher ();
 
 // 	 // Turn off key_data_valid again.
 // 	 tb_key_data_valid = 0;
-	 
+
 //  	 $display("TB-SIM: Key loaded ok.");
 //      end
 //    endtask // tc1_load_key
 
-   
+
 //    //---------------------------------------------------------------
 //    // tc2_init_cipher;
 //    // Test case2: Init cipher.
@@ -325,10 +325,10 @@ module tb_pirate_cipher ();
 // 	 $display("TC2: Cipher init.");
 // 	 // Clear the errors_found counter
 // 	 errors_found = 0;
-	 
+
 // 	 // Wait a few cycles
 // //	 #(CLOCK * 40);
-	 
+
 // 	 // Set the tb_init_cipher high for a cycle.
 // 	 tb_init_cipher = 1;
 // 	 $display("TB-ARCFOUR: init_cipher = %1d", tb_init_cipher);
@@ -347,7 +347,7 @@ module tb_pirate_cipher ();
 // 	 $display("TB-INFO: jp = %3d, jd = %3d", DUT.jp, DUT.jd);
 // 	 $display("TB-INFO: kp = %3d, kd = %3d", DUT.kp, DUT.kd);
 // 	 $display("");
-	 
+
 // 	 for (i = 0 ; i < 256 ; i = i + 1)
 // 	   begin
 // 	      $display("state_mem[%3d] = %3d", i, DUT.state_mem.mem_array[i]);
@@ -358,7 +358,7 @@ module tb_pirate_cipher ();
 // 	   begin
 // 	      tb_next_k = 1;
 // 	      #(CLOCK * 1);
-	      
+
 // 	      while (tb_k_valid == 0)
 // 		begin
 // 		   #(CLOCK);
@@ -368,14 +368,14 @@ module tb_pirate_cipher ();
 
 // 	 // Turn off generation.
 // 	 tb_next_k = 0;
-	 
+
 // 	 errors_found = 0;
 //      end
 //    endtask // tc2_init_cipher
-   
 
-  
-   
+
+
+
    //---------------------------------------------------------------
    // Main simulation functionality.
    // Calls the test tasks to perform the different test cases.
@@ -384,23 +384,23 @@ module tb_pirate_cipher ();
      begin
        // Initialize the test bench
        init_testbench;
-       
+
        // Print a nice and informative start message about the DUT and
        // the types of test that are going to be performed.
        $display("\n");
        $display("     *** Start of arc4 core functional simulation ***");
        $display("\n");
-       
-       // Wait for the reset to be deasserted. 
+
+       // Wait for the reset to be deasserted.
        wait (reset_l == 1);
-       
+
        // Enable the monitor
        enable_monitor = 1;
-       
+
        // Run through the test cases, adding the errors as we
        // go along.
        // 	tc1_load_key(errors);
-       
+
        // 	num_errors = num_errors + errors;
        // 	tc2_init_cipher(errors);
        // 	num_errors = num_errors + errors;
@@ -410,15 +410,15 @@ module tb_pirate_cipher ();
 
        // Set the init flag:
        $display("Initializing.");
-       
+
        // Wait a while
        #1000;
-       
+
        // Finish the simulation including presenting the number of
        // errors found during simulation
        $display("TB-SIM: Simulation finished.");
        $display("TB-SIM: Number of cycles consumed: %d", cycle_counter);
-       
+
        if (num_errors == 0)
 	 begin
 	   $display("TB-SIM: no errors found during simulation.");
@@ -429,9 +429,9 @@ module tb_pirate_cipher ();
 	 end
        $finish;
      end
-  
-endmodule // tb_arc4
+
+endmodule // tb_robber_language
 
 //======================================================================
-// EOF tb_pirate_cipher.v
+// EOF tb_robber_language.v
 //======================================================================
