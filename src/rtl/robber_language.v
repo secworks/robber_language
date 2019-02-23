@@ -114,11 +114,11 @@ module robber_language(
   // is_consonant
   // flag signal. If set the current data on the data_in port
   // is a consonant.
-  reg 			    is_consonant;
+  reg is_consonant;
 
   // data_out_mux_ctrl
   // control signal for the data out mux.
-  reg [1 : 0] 		    data_out_mux_ctrl;
+  reg [1 : 0]  data_out_mux_ctrl;
 
 
   //----------------------------------------------------------------
@@ -141,10 +141,10 @@ module robber_language(
       if (!reset_l)
 	begin
 	  // Reset all registers to defined values.
-	  consonant_hold_reg        <= 0;
-	  busy_reg 	            <= 0;
-	  data_out_reg              <= 0;
-	  data_out_valid_reg        <= 0;
+	  consonant_hold_reg        <= 1'h0;
+	  busy_reg 	            <= 1'h0;
+	  data_out_reg              <= 1'h0;
+	  data_out_valid_reg        <= 1'h0;
 	  robber_language_state_reg <= FSM_IDLE;
 	end
       else
@@ -176,10 +176,10 @@ module robber_language(
     begin : consonant_detect
       case (data_in)
         "a", "A", "o", "O", "u", "U", "e", "E", "i", "I", "y", "Y":
-          is_consonant = 0;
+          is_consonant = 1'h0;
 
         default:
-          is_consonant = 1;
+          is_consonant = 1'h1;
       endcase // case (data_in)
     end // consonant_detect
 
@@ -214,15 +214,15 @@ module robber_language(
   always @*
     begin : robber_language_ctrl
       // Default assignments
-      data_out_we 	        = 0;
-      data_out_valid_new        = 0;
-      data_out_valid_we         = 0;
-      consonant_hold_we         = 0;
-      busy_new 		        = 0;
-      busy_we 		        = 0;
+      data_out_we 	        = 1'h0;
+      data_out_valid_new        = 1'h0;
+      data_out_valid_we         = 1'h0;
+      consonant_hold_we         = 1'h0;
+      busy_new 		        = 1'h0;
+      busy_we 		        = 1'h0;
       data_out_mux_ctrl         = DOUT_DIN;
       robber_language_state_new = FSM_IDLE;
-      robber_language_state_we  = 0;
+      robber_language_state_we  = 1'h0;
 
       case (robber_language_state_reg)
 	FSM_IDLE:
@@ -230,27 +230,27 @@ module robber_language(
 	    if (init)
 	      begin
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	  end
 
 
 	FSM_INIT:
 	  begin
-	    busy_new 	       = 0;
-	    busy_we 	       = 1;
-	    data_out_valid_new = 0;
-	    data_out_valid_we  = 1;
+	    busy_new 	       = 1'h0;
+	    busy_we 	       = 1'h1;
+	    data_out_valid_new = 1'h0;
+	    data_out_valid_we  = 1'h1;
 
 	    if (encdec)
 	      begin
 		robber_language_state_new = FSM_ENC0;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
 		robber_language_state_new = FSM_DEC0;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	  end
 
@@ -259,32 +259,32 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		busy_new 		  = 0;
-		busy_we 		  = 1;
-		data_out_valid_new 	  = 0;
-		data_out_valid_we 	  = 1;
+		busy_new 		  = 1'h0;
+		busy_we 		  = 1'h1;
+		data_out_valid_new 	  = 1'h0;
+		data_out_valid_we 	  = 1'h1;
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
-		data_out_valid_new = 0;
-		data_out_valid_we  = 1;
+		data_out_valid_new = 1'h0;
+		data_out_valid_we  = 1'h1;
 
 		if (data_in_valid)
 		  begin
-		    data_out_we        = 1;
-		    data_out_valid_new = 1;
-		    data_out_valid_we  = 1;
+		    data_out_we        = 1'h1;
+		    data_out_valid_new = 1'h1;
+		    data_out_valid_we  = 1'h1;
 		    data_out_mux_ctrl  = DOUT_DIN;
 
 		    if (is_consonant)
 		      begin
-			busy_new 	          = 1;
-			busy_we 	          = 1;
-			consonant_hold_we         = 1;
+			busy_new 	          = 1'h1;
+			busy_we 	          = 1'h1;
+			consonant_hold_we         = 1'h1;
 			robber_language_state_new = FSM_ENC1;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		  end
 	      end
@@ -295,19 +295,19 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		busy_new 	        = 0;
-		busy_we 	        = 1;
-		data_out_valid_new      = 0;
-		data_out_valid_we       = 1;
+		busy_new 	        = 1'h0;
+		busy_we 	        = 1'h1;
+		data_out_valid_new      = 1'h0;
+		data_out_valid_we       = 1'h1;
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
 		data_out_mux_ctrl       = DOUT_OH;
-		data_out_we 	        = 1;
+		data_out_we 	        = 1'h1;
 		robber_language_state_new = FSM_ENC2;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	  end
 
@@ -316,19 +316,19 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		busy_new 	        = 0;
-		busy_we 	        = 1;
-		data_out_valid_new      = 0;
-		data_out_valid_we       = 1;
+		busy_new 	        = 1'h0;
+		busy_we 	        = 1'h1;
+		data_out_valid_new      = 1'h0;
+		data_out_valid_we       = 1'h1;
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
 		data_out_mux_ctrl         = DOUT_HOLD;
-		data_out_we 	          = 1;
+		data_out_we 	          = 1'h1;
 		robber_language_state_new = FSM_ENC0;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	  end
 
@@ -336,30 +336,30 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		busy_new 		   = 0;
-		busy_we 		   = 1;
-		data_out_valid_new 	   = 0;
-		data_out_valid_we 	   = 1;
+		busy_new 		   = 1'h0;
+		busy_we 		   = 1'h1;
+		data_out_valid_new 	   = 1'h0;
+		data_out_valid_we 	   = 1'h1;
 		robber_language_state_new  = FSM_INIT;
-		robber_language_state_we   = 1;
+		robber_language_state_we   = 1'h1;
 	      end
 	    else
 	      begin
-		data_out_valid_new = 0;
-		data_out_valid_we  = 1;
+		data_out_valid_new = 1'h0;
+		data_out_valid_we  = 1'h1;
 
 		if (data_in_valid)
 		  begin
-		    data_out_we        = 1;
-		    data_out_valid_new = 1;
-		    data_out_valid_we  = 1;
+		    data_out_we        = 1'h1;
+		    data_out_valid_new = 1'h1;
+		    data_out_valid_we  = 1'h1;
 		    data_out_mux_ctrl  = DOUT_DIN;
 
 		    if (is_consonant)
 		      begin
-			consonant_hold_we         = 1;
+			consonant_hold_we         = 1'h1;
 			robber_language_state_new = FSM_DEC1;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		  end
 	      end
@@ -369,32 +369,32 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		data_out_valid_new = 0;
-		data_out_valid_we  = 1;
+		data_out_valid_new = 1'h0;
+		data_out_valid_we  = 1'h1;
 
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
-		data_out_valid_new = 0;
-		data_out_valid_we  = 1;
+		data_out_valid_new = 1'h0;
+		data_out_valid_we  = 1'h1;
 
 		if (data_in_valid)
 		  begin
 		    if (data_in == "o")
 		      begin
 			robber_language_state_new = FSM_DEC2;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		    else
 		      begin
-			data_out_we               = 1;
-			data_out_valid_new        = 1;
-			data_out_valid_we         = 1;
+			data_out_we               = 1'h1;
+			data_out_valid_new        = 1'h1;
+			data_out_valid_we         = 1'h1;
 			data_out_mux_ctrl         = DOUT_DIN;
 			robber_language_state_new = FSM_DEC0;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		  end
 	      end
@@ -405,31 +405,31 @@ module robber_language(
 	  begin
 	    if (init)
 	      begin
-		data_out_valid_new        = 0;
-		data_out_valid_we         = 1;
+		data_out_valid_new        = 1'h0;
+		data_out_valid_we         = 1'h1;
 		robber_language_state_new = FSM_INIT;
-		robber_language_state_we  = 1;
+		robber_language_state_we  = 1'h1;
 	      end
 	    else
 	      begin
-		data_out_valid_new = 0;
-		data_out_valid_we  = 1;
+		data_out_valid_new = 1'h0;
+		data_out_valid_we  = 1'h1;
 
 		if (data_in_valid)
 		  begin
 		    if (data_in == consonant_hold_reg)
 		      begin
 			robber_language_state_new = FSM_DEC0;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		    else
 		      begin
-			data_out_we 	          = 1;
-			data_out_valid_new        = 1;
-			data_out_valid_we         = 1;
+			data_out_we 	          = 1'h1;
+			data_out_valid_new        = 1'h1;
+			data_out_valid_we         = 1'h1;
 			data_out_mux_ctrl         = DOUT_DIN;
 			robber_language_state_new = FSM_DEC0;
-			robber_language_state_we  = 1;
+			robber_language_state_we  = 1'h1;
 		      end
 		  end
 	      end
